@@ -15,13 +15,37 @@ export class App {
     const container = document.getElementById(elementId);
     container.innerHTML = `
       <style>
-        #app-body {
-          background-color: red;
-          color: white;
-        }
+        /* TODO : ADD PAGE-SPECIFIC CSS HERE */
       </style>
-      <div id="app-body">
-        TODO
+      <div id="app-body" class="page">
+        <div class="page-wrapper">
+          <div class="page-body">
+            <div class="container-xl">
+              <div class="row row-deck row-cards">
+                <div class="col-4">
+                  <div class="card">
+                    <div class="card-body" style="height: 10rem"></div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="card">
+                    <div class="card-body" style="height: 10rem"></div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="card">
+                    <div class="card-body" style="height: 10rem"></div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body" style="height: 10rem"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
