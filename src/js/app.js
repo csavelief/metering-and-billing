@@ -17,10 +17,11 @@ export class App {
       <style>
         #app-body {
           background-color: red;
+          color: white;
         }
       </style>
       <div id="app-body">
-        <!-- FILLED DYNAMICALLY -->
+        TODO
       </div>
     `;
   }
