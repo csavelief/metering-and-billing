@@ -38,9 +38,9 @@
     </h1>
   </div>
 </header>
-<div id="app">
+<div id="app"></div>
 
-<!-- CF -->
+<!-- CF-Specific -->
 <script>
   window.process = {
     env: {
@@ -49,6 +49,7 @@
   }
 </script>
 <script src="js/main.min.js"></script>
+<script src="js/idb.js"></script>
 
 <!-- App Specific -->
 <link href="css/app.css" rel="stylesheet">
@@ -58,6 +59,48 @@
 
   const app = new App();
   app.init('app');
+
+  // Example (database usage)
+  const data1 = {id: 1, label: 'Exemple n°1', description: 'Mon premier exemple.'};
+  const data2 = {id: 2, label: 'Exemple n°2', description: 'Mon second exemple.'};
+  const idb = com.computablefacts.idb;
+  const db = idb.getOrAddDataset('exemples');
+
+  db.save(data1, () => {
+    console.log('Object saved!');
+  });
+
+  db.count(count => {
+    console.log('Count is ' + count);
+  });
+
+  db.save(data2, () => {
+    console.log('Object saved!');
+  });
+
+  db.count(count => {
+    console.log('Count is ' + count);
+  });
+
+  db.getAll(all => {
+    console.log(all);
+  });
+
+  db.delete(data1.id, () => {
+    console.log('Object deleted!');
+  });
+
+  db.getAll(all => {
+    console.log(all);
+  });
+
+  db.clear(() => {
+    console.log('Objects deleted!');
+  });
+
+  db.getAll(all => {
+    console.log(all);
+  });
 
 </script>
 </body>
