@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Metering & Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+
+  <!-- Blueprintjs -->
+  <link href="css/normalize/normalize.css" rel="stylesheet">
+  <link href="css/blueprintjs/blueprint-icons.css" rel="stylesheet">
+  <link href="css/blueprintjs/blueprint.css" rel="stylesheet">
+  <link href="css/blueprintjs/blueprint-popover2.css" rel="stylesheet">
+  <link href="css/blueprintjs/table.css" rel="stylesheet">
+  <link href="css/blueprintjs/blueprint-select.css" rel="stylesheet">
+  <link href="css/blueprintjs/blueprint-datetime.css" rel="stylesheet"/>
+
+  <!-- Reactjs -->
+  <script src="js/blueprintjs/react.production.min.js"></script>
+  <script src="js/blueprintjs/react-dom.production.min.js"></script>
+  <script src="js/blueprintjs/react-is.production.min.js"></script>
+
+</head>
+<body>
+<div id="toaster"></div>
+<div id="panel"></div>
+<div id="app">
+
+<!-- CF -->
+<script>
+  window.process = {
+    env: {
+      NODE_ENV: 'production'
+    }
+  }
+</script>
+<script src="js/main.min.js"></script>
+
+<!-- App Specific -->
+<link href="css/app.css" rel="stylesheet">
+<script type="module">
+
+  import {App} from './js/app.js';
+
+  const app = new App();
+  app.init('app');
+
+</script>
+</body>
+</html>
