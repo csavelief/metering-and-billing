@@ -85,8 +85,7 @@ export class CardFeatures extends com.computablefacts.widgets.Widget {
     const elBtnCreateFeature = elCard.querySelector('#modal-add-feature .modal-footer .btn-primary');
     elBtnCreateFeature.onclick = (e) => {
       const elInputFeatureName = elCard.querySelector('#modal-add-feature .modal-body input');
-      this.features_.addOrUpdate(elInputFeatureName.value);
-      elTable.rows = this.features_.all();
+      this.addOrUpdateFeature(elInputFeatureName.value);
       this.observers_.notify('features-update');
     };
     return elCard;

@@ -85,8 +85,7 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
     const elBtnCreateCustomer = elCard.querySelector('#modal-add-customer .modal-footer .btn-primary');
     elBtnCreateCustomer.onclick = (e) => {
       const elInputCustomerName = elCard.querySelector('#modal-add-customer .modal-body input');
-      this.customers_.add(elInputCustomerName.value);
-      elTable.rows = this.customers_.all();
+      this.addCustomer(elInputCustomerName.value);
       this.observers_.notify('customers-update');
     };
     return elCard;

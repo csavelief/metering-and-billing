@@ -12,6 +12,10 @@ export class CardStrategies extends com.computablefacts.widgets.Widget {
     this.observers_ = new com.computablefacts.observers.Subject();
   }
 
+  get strategies() {
+    return this.strategies_;
+  }
+  
   set features(features) {
     this.features_ = features;
     this.render();
@@ -126,7 +130,7 @@ function strategy(events) {
     const elBtnCreateStrategy = elCard.querySelector('#modal-add-strategy .modal-footer .btn-primary');
     elBtnCreateStrategy.onclick = (e) => {
 
-      const getSelectValues = (select) => {
+      const getSelection = (select) => {
 
         const result = [];
         const options = select && select.options;
@@ -143,9 +147,8 @@ function strategy(events) {
 
       const elInputStrategyName = elCard.querySelector('#modal-add-strategy .modal-body input');
       const elStrategyImplementation = elCard.querySelector('#modal-add-strategy .modal-body textarea');
-      this.strategies_.addOrUpdate(elInputStrategyName.value, getSelectValues(elSelectFeatures),
+      this.addOrUpdateStrategy(elInputStrategyName.value, getSelection(elSelectFeatures),
           new Function('return ' + elStrategyImplementation.value)());
-      elTable.rows = this.strategies_.all();
       this.observers_.notify('strategies-update');
     };
     return elCard;
