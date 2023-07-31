@@ -3,6 +3,7 @@
 import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Strategies} from "./datastore.js";
 import {CardCustomers} from "./CardCustomers.js";
 import {CardFeatures} from "./CardFeatures.js";
+import {CardStrategies} from "./CardStrategies.js";
 
 export class App {
 
@@ -33,6 +34,11 @@ export class App {
                   <!-- FILLED DYNAMICALLY -->
                 </div>
               </div>
+              <div class="row row-deck row-cards" style="margin-top: var(--tblr-gutter-y)">
+                <div id="card-strategies" class="col">
+                  <!-- FILLED DYNAMICALLY -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -42,32 +48,27 @@ export class App {
     // PoC
     this._meteringAndBillingPoC();
 
-    // Init the Customers card
-    const elCardCustomers = container.querySelector('#card-customers');
-    const cardCustomers = new CardCustomers(elCardCustomers);
-    cardCustomers.addCustomer('ACME Inc.');
+    // Init the 'Strategies' card
+    const elCardStrategies = container.querySelector('#card-strategies');
+    const elStrategies = new CardStrategies(elCardStrategies);
+    elStrategies.addOrUpdateStrategy('Summing Strategy', ['user-created'], (events) => {
+      return events.reduce((prev, cur) => prev + cur.amount, 0);
+    });
+    elStrategies.addOrUpdateStrategy('Multiplying Strategy', ['user-created'], (events) => {
+      return events.reduce((prev, cur) => prev * cur.amount, 1);
+    });
 
-    // Init the Features card
+    // Init the 'Customers' card
+    const elCardCustomers = container.querySelector('#card-customers');
+    const elCustomers = new CardCustomers(elCardCustomers);
+    elCustomers.addCustomer('ACME Inc.');
+
+    // Init the 'Features' card
     const elCardFeatures = container.querySelector('#card-features');
-    const cardFeatures = new CardFeatures(elCardFeatures);
-    cardFeatures.addOrUpdateFeature('user-created');
-    cardFeatures.addOrUpdateFeature('user-deleted');
-    cardFeatures.addOrUpdateFeature('user-created1');
-    cardFeatures.addOrUpdateFeature('user-deleted2');
-    cardFeatures.addOrUpdateFeature('user-created3');
-    cardFeatures.addOrUpdateFeature('user-deleted4');
-    cardFeatures.addOrUpdateFeature('user-created5');
-    cardFeatures.addOrUpdateFeature('user-deleted6');
-    cardFeatures.addOrUpdateFeature('user-created7');
-    cardFeatures.addOrUpdateFeature('user-deleted8');
-    cardFeatures.addOrUpdateFeature('user-created9');
-    cardFeatures.addOrUpdateFeature('user-deleted10');
-    cardFeatures.addOrUpdateFeature('user-created11');
-    cardFeatures.addOrUpdateFeature('user-deleted12');
-    cardFeatures.addOrUpdateFeature('user-created13');
-    cardFeatures.addOrUpdateFeature('user-deleted14');
-    cardFeatures.addOrUpdateFeature('user-created15');
-    cardFeatures.addOrUpdateFeature('user-deleted16');
+    const elFeatures = new CardFeatures(elCardFeatures);
+    elFeatures.addOrUpdateFeature('user-created');
+    elFeatures.onFeaturesUpdate(features => elStrategies.features = features);
+    elStrategies.features = elFeatures.features;
 
     // TODO
   }

@@ -8,11 +8,24 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
   constructor(container) {
     super(container);
     this.customers_ = new Customers();
+    this.observers_ = new com.computablefacts.observers.Subject();
+  }
+
+  get customers() {
+    return this.customers_;
   }
 
   addCustomer(email) {
     this.customers_.add(email);
     this.render();
+  }
+
+  onCustomersUpdate(callback) {
+    this.observers_.register('customers-update', () => {
+      if (callback) {
+        callback(this.customers_);
+      }
+    });
   }
 
   /**
@@ -52,8 +65,8 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label class="form-label">Name</label>
-                <input type="text" class="form-control" placeholder="The customer's name" data-form-type="other">
+                <label class="form-label">The customer's name :</label>
+                <input type="text" class="form-control" data-form-type="other">
               </div>
             </div>
             <div class="modal-footer">
@@ -65,16 +78,16 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
       </div>
     `;
 
-    const elCardTable = elCard.querySelector('.card-table');
-    const table = new Table(elCardTable);
-    table.columns = [{name: '#', attribute: 'id'}, {name: 'Name', attribute: 'name'}];
-    table.rows = this.customers_.all();
+    const elTable = new Table(elCard.querySelector('.card-table'));
+    elTable.columns = [{name: '#', attribute: 'id'}, {name: 'Name', attribute: 'name'}];
+    elTable.rows = this.customers_.all();
 
-    const btnCreateCustomer = elCard.querySelector('#modal-add-customer .modal-footer .btn-primary');
-    btnCreateCustomer.onclick = (e) => {
-      const inputCustomer = elCard.querySelector('#modal-add-customer .modal-body input');
-      this.customers_.add(inputCustomer.value);
-      table.rows = this.customers_.all();
+    const elBtnCreateCustomer = elCard.querySelector('#modal-add-customer .modal-footer .btn-primary');
+    elBtnCreateCustomer.onclick = (e) => {
+      const elInputCustomerName = elCard.querySelector('#modal-add-customer .modal-body input');
+      this.customers_.add(elInputCustomerName.value);
+      elTable.rows = this.customers_.all();
+      this.observers_.notify('customers-update');
     };
     return elCard;
   }

@@ -93,7 +93,7 @@ export class Strategies {
     if (strategy) {
       strategy.name = name;
       strategy.features = features;
-      strategy.apply = fnStrategy;
+      strategy.strategy = fnStrategy;
       return strategy;
     }
 

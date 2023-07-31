@@ -8,11 +8,24 @@ export class CardFeatures extends com.computablefacts.widgets.Widget {
   constructor(container) {
     super(container);
     this.features_ = new Features();
+    this.observers_ = new com.computablefacts.observers.Subject();
+  }
+
+  get features() {
+    return this.features_;
   }
 
   addOrUpdateFeature(name) {
     this.features_.addOrUpdate(name);
     this.render();
+  }
+
+  onFeaturesUpdate(callback) {
+    this.observers_.register('features-update', () => {
+      if (callback) {
+        callback(this.features_);
+      }
+    });
   }
 
   /**
@@ -52,8 +65,8 @@ export class CardFeatures extends com.computablefacts.widgets.Widget {
             </div>
             <div class="modal-body">
               <div class="mb-3">
-                <label class="form-label">Name</label>
-                <input type="text" class="form-control" placeholder="The feature's name" data-form-type="other">
+                <label class="form-label">The feature's name :</label>
+                <input type="text" class="form-control" data-form-type="other">
               </div>
             </div>
             <div class="modal-footer">
@@ -65,16 +78,16 @@ export class CardFeatures extends com.computablefacts.widgets.Widget {
       </div>
     `;
 
-    const elCardTable = elCard.querySelector('.card-table');
-    const table = new Table(elCardTable);
-    table.columns = [{name: '#', attribute: 'id'}, {name: 'Name', attribute: 'name'}];
-    table.rows = this.features_.all();
+    const elTable = new Table(elCard.querySelector('.card-table'));
+    elTable.columns = [{name: '#', attribute: 'id'}, {name: 'Name', attribute: 'name'}];
+    elTable.rows = this.features_.all();
 
-    const btnCreateFeature = elCard.querySelector('#modal-add-feature .modal-footer .btn-primary');
-    btnCreateFeature.onclick = (e) => {
-      const inputFeature = elCard.querySelector('#modal-add-feature .modal-body input');
-      this.features_.addOrUpdate(inputFeature.value);
-      table.rows = this.features_.all();
+    const elBtnCreateFeature = elCard.querySelector('#modal-add-feature .modal-footer .btn-primary');
+    elBtnCreateFeature.onclick = (e) => {
+      const elInputFeatureName = elCard.querySelector('#modal-add-feature .modal-body input');
+      this.features_.addOrUpdate(elInputFeatureName.value);
+      elTable.rows = this.features_.all();
+      this.observers_.notify('features-update');
     };
     return elCard;
   }
