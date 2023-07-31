@@ -69,40 +69,7 @@ export class Features {
 }
 
 /**
- * A list of prices associated to each feature.
- */
-export class Prices {
-
-  constructor() {
-    this.prices_ = [];
-  }
-
-  get(name) {
-    return this.prices_.find(p => p.name === name);
-  }
-
-  addOrUpdate(name, featureName, price) {
-
-    let pricee = this.get(name);
-
-    if (pricee) {
-      pricee.name = name;
-      pricee.feature = featureName;
-      pricee.price = price;
-      return pricee;
-    }
-
-    pricee = {
-      id: this.prices_.length + 1, name: name, feature: featureName, price: price
-    };
-
-    this.prices_.push(pricee);
-    return pricee;
-  }
-}
-
-/**
- * A strategy applies a given price to a given feature.
+ * A strategy takes a list of features and returns a price.
  */
 export class Strategies {
 
@@ -110,23 +77,28 @@ export class Strategies {
     this.strategies_ = [];
   }
 
+  all() {
+    return this.strategies_;
+  }
+
   get(name) {
     return this.strategies_.find(p => p.name === name);
   }
 
-  // fnStrategy(the app-generated events for the given feature, the feature's price)
-  addOrUpdate(name, fnStrategy) {
+  // fnStrategy(the app-generated events)
+  addOrUpdate(name, features, fnStrategy) {
 
     let strategy = this.get(name);
 
     if (strategy) {
       strategy.name = name;
+      strategy.features = features;
       strategy.apply = fnStrategy;
       return strategy;
     }
 
     strategy = {
-      id: this.strategies_.length + 1, name: name, strategy: fnStrategy
+      id: this.strategies_.length + 1, name: name, features: features, strategy: fnStrategy
     };
 
     this.strategies_.push(strategy);
@@ -143,18 +115,21 @@ export class Plans {
     this.plans_ = [];
   }
 
+  all() {
+    return this.plans_;
+  }
+
   get(name) {
     return this.plans_.find(p => p.name === name);
   }
 
-  addOrUpdate(name, strategyName, priceName, begin, end) {
+  addOrUpdate(name, strategyName, begin, end) {
 
     let plan = this.get(name);
 
     if (plan) {
       plan.name = name;
       plan.strategy = strategyName;
-      plan.price = priceName;
       plan.begin = begin;
       plan.end = end;
       return plan;
@@ -164,7 +139,6 @@ export class Plans {
       id: this.plans_.length + 1,
       name: name,
       strategy: strategyName,
-      price: priceName,
       begin: !begin ? new Date().getTime() : begin,
       end: end
     };
@@ -237,8 +211,12 @@ export class Events {
     this.events_ = [];
   }
 
-  get(customer, feature) {
-    return this.events_.filter(e => e.customer === customer && e.feature === feature);
+  all() {
+    return this.events_;
+  }
+
+  get(customer, features) {
+    return this.events_.filter(e => e.customer === customer && features.indexOf(e.feature) >= 0);
   }
 
   add(customerName, featureName, amount) {
@@ -258,10 +236,9 @@ export class Events {
 
 export class Pricer {
 
-  constructor(customers, features, prices, strategies, plans, schedules, events) {
+  constructor(customers, features, strategies, plans, schedules, events) {
     this.customers_ = customers;
     this.features_ = features;
-    this.prices_ = prices;
     this.strategies_ = strategies;
     this.plans_ = plans;
     this.schedules_ = schedules;
@@ -275,13 +252,12 @@ export class Pricer {
 
         const plan = this.plans_.get(p.plan);
         const strategy = this.strategies_.get(plan.strategy);
-        const price = this.prices_.get(plan.price);
         const begin = plan.begin;
         const end = plan.end;
-        const events = this.events_.get(customerName, price.feature).filter(
+        const events = this.events_.get(customerName, strategy.features).filter(
             e => (!begin || e.timestamp >= begin) && (!end || e.timestamp <= end));
 
-        return strategy.strategy(events, price.price);
+        return strategy.strategy(events);
       });
     }).reduce((prev, cur) => prev + cur, 0);
   }

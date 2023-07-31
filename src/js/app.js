@@ -1,6 +1,6 @@
 'use strict'
 
-import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Prices, Strategies} from "./datastore.js";
+import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Strategies} from "./datastore.js";
 import {CardCustomers} from "./CardCustomers.js";
 import {CardFeatures} from "./CardFeatures.js";
 
@@ -75,36 +75,37 @@ export class App {
   _meteringAndBillingPoC() {
 
     const customers = new Customers();
-    customers.add('jdoe@example.com');
+    customers.add('ACME Inc.');
 
     const features = new Features();
     features.addOrUpdate('nb_connections');
 
-    const prices = new Prices();
-    prices.addOrUpdate('1 cent', 'nb_connections', 1);
-
     const strategies = new Strategies();
-    strategies.addOrUpdate('sum', (events, price) => events.reduce((prev, cur) => prev + (cur.amount * price), 0));
-    strategies.addOrUpdate('mul', (events, price) => events.reduce((prev, cur) => prev * (cur.amount * price), 1));
+    strategies.addOrUpdate('sum', ['nb_connections'], (events) => {
+      return events.reduce((prev, cur) => prev + cur.amount, 0)
+    });
+    strategies.addOrUpdate('mul', ['nb_connections'], (events) => {
+      return events.reduce((prev, cur) => prev * cur.amount, 1)
+    });
 
     const plans = new Plans();
-    plans.addOrUpdate('Plan n°1', 'sum', '1 cent', null, null);
-    plans.addOrUpdate('Plan n°2', 'mul', '1 cent', null, null);
+    plans.addOrUpdate('Plan n°1', 'sum', null, null);
+    plans.addOrUpdate('Plan n°2', 'mul', null, null);
 
-    const schedule = new CustomerSchedule('jdoe@example.com');
+    const schedule = new CustomerSchedule('ACME Inc.');
     schedule.add('Plan n°1');
     schedule.add('Plan n°2');
 
     const events = new Events();
-    events.add('jdoe@example.com', 'nb_connections', 1);
-    events.add('jdoe@example.com', 'nb_connections', 1);
-    events.add('jdoe@example.com', 'nb_connections', 1);
+    events.add('ACME Inc.', 'nb_connections', 1);
+    events.add('ACME Inc.', 'nb_connections', 1);
+    events.add('ACME Inc.', 'nb_connections', 1);
 
-    const pricer = new Pricer(customers, features, prices, strategies, plans, [schedule], events);
-    const sum1 = pricer.price('jdoe@example.com');
-    const sum2 = pricer.price('jdoe@example.com', ['Plan n°2']);
-    const sum3 = pricer.price('jdoe@example.com', ['Plan n°1']);
-    const sum4 = pricer.price('jdoe@example.com', ['Plan n°1', 'Plan n°2']);
+    const pricer = new Pricer(customers, features, strategies, plans, [schedule], events);
+    const sum1 = pricer.price('ACME Inc.');
+    const sum2 = pricer.price('ACME Inc.', ['Plan n°2']);
+    const sum3 = pricer.price('ACME Inc.', ['Plan n°1']);
+    const sum4 = pricer.price('ACME Inc.', ['Plan n°1', 'Plan n°2']);
 
     console.log('[S1] sum price is ' + sum1 + ' (expected=4)');
     console.log('[S2] sum price is ' + sum2 + ' (expected=1)');
