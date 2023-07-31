@@ -48,11 +48,15 @@ export class Table extends com.computablefacts.widgets.Widget {
     elHeader.innerHTML = columns.join('\n');
 
     const elBody = elTable.querySelector('tbody');
-    this._page().forEach(rows => {
+    this._page().forEach(row => {
 
       const columns = [];
       this.columns_.forEach(column => {
-        columns.push(`<td>${rows[column.attribute]}</td>`);
+        if (column.render) {
+          columns.push(`<td>${column.render(row)}</td>`);
+        } else {
+          columns.push(`<td>${row[column.attribute]}</td>`);
+        }
       });
 
       const elRow = document.createElement('tr');
@@ -107,13 +111,11 @@ export class Table extends com.computablefacts.widgets.Widget {
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M15 6l-6 6l6 6"></path>
               </svg>
-              prev
             </a>
           </li>
           ${links()}
           <li class="page-item ${this.pageNumber_ === this._nbPages() - 1 ? 'disabled' : ''}">
             <a class="page-link" href="#" data-attr="next">
-              next
               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M9 6l6 6l-6 6"></path>
