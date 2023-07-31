@@ -13,20 +13,20 @@ export class Customers {
     return this.customers_;
   }
 
-  get(email) {
-    return this.customers_.find(c => c.email === email);
+  get(name) {
+    return this.customers_.find(c => c.name === name);
   }
 
-  add(email) {
+  add(name) {
 
-    let customer = this.get(email);
+    let customer = this.get(name);
 
     if (customer) {
       return customer;
     }
 
     customer = {
-      id: this.customers_.length + 1, email: email,
+      id: this.customers_.length + 1, name: name,
     };
 
     this.customers_.push(customer);
@@ -188,8 +188,8 @@ export class Plans {
  */
 export class CustomerSchedule {
 
-  constructor(customerEmail) {
-    this.customer_ = customerEmail;
+  constructor(customerName) {
+    this.customer_ = customerName;
     this.plans_ = [];
   }
 
@@ -241,12 +241,12 @@ export class Events {
     return this.events_.filter(e => e.customer === customer && e.feature === feature);
   }
 
-  add(customerEmail, featureName, amount) {
+  add(customerName, featureName, amount) {
 
     const event = {
       id: this.events_.length + 1,
       timestamp: new Date().getTime(),
-      customer: customerEmail,
+      customer: customerName,
       feature: featureName,
       amount: amount
     };
@@ -268,8 +268,8 @@ export class Pricer {
     this.events_ = events;
   }
 
-  price(customerEmail, plans) {
-    return this.schedules_.filter(schedule => schedule.customer() === customerEmail)
+  price(customerName, plans) {
+    return this.schedules_.filter(schedule => schedule.customer() === customerName)
     .flatMap(schedule => {
       return schedule.plans().filter(p => !plans || plans.indexOf(p.plan) >= 0).map(p => {
 
@@ -278,7 +278,7 @@ export class Pricer {
         const price = this.prices_.get(plan.price);
         const begin = plan.begin;
         const end = plan.end;
-        const events = this.events_.get(customerEmail, price.feature).filter(
+        const events = this.events_.get(customerName, price.feature).filter(
             e => (!begin || e.timestamp >= begin) && (!end || e.timestamp <= end));
 
         return strategy.strategy(events, price.price);

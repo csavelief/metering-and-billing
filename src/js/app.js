@@ -45,7 +45,7 @@ export class App {
     // Init the Customers card
     const elCardCustomers = container.querySelector('#card-customers');
     const cardCustomers = new CardCustomers(elCardCustomers);
-    cardCustomers.addCustomer('jdoe@example.com');
+    cardCustomers.addCustomer('ACME Inc.');
 
     // Init the Features card
     const elCardFeatures = container.querySelector('#card-features');
