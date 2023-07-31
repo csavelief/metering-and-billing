@@ -51,6 +51,23 @@ export class App {
     const elCardFeatures = container.querySelector('#card-features');
     const cardFeatures = new CardFeatures(elCardFeatures);
     cardFeatures.addOrUpdateFeature('user-created');
+    cardFeatures.addOrUpdateFeature('user-deleted');
+    cardFeatures.addOrUpdateFeature('user-created1');
+    cardFeatures.addOrUpdateFeature('user-deleted2');
+    cardFeatures.addOrUpdateFeature('user-created3');
+    cardFeatures.addOrUpdateFeature('user-deleted4');
+    cardFeatures.addOrUpdateFeature('user-created5');
+    cardFeatures.addOrUpdateFeature('user-deleted6');
+    cardFeatures.addOrUpdateFeature('user-created7');
+    cardFeatures.addOrUpdateFeature('user-deleted8');
+    cardFeatures.addOrUpdateFeature('user-created9');
+    cardFeatures.addOrUpdateFeature('user-deleted10');
+    cardFeatures.addOrUpdateFeature('user-created11');
+    cardFeatures.addOrUpdateFeature('user-deleted12');
+    cardFeatures.addOrUpdateFeature('user-created13');
+    cardFeatures.addOrUpdateFeature('user-deleted14');
+    cardFeatures.addOrUpdateFeature('user-created15');
+    cardFeatures.addOrUpdateFeature('user-deleted16');
 
     // TODO
   }

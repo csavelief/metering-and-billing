@@ -1,6 +1,7 @@
 'use strict'
 
 import {Customers} from "./datastore.js";
+import {Table} from "./Table.js";
 
 export class CardCustomers extends com.computablefacts.widgets.Widget {
 
@@ -26,30 +27,15 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
         <h3 class="card-title">Customers</h3>
       </div>
       <div class="card-table table-responsive">
-        <table class="table table-vcenter">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- FILLED DYNAMICALLY -->
-          </tbody>
-        </table>   
+        <!-- FILLED DYNAMICALLY -->
       </div>
     `;
 
-    const elList = elCard.querySelector('tbody');
-    this.customers_.all().forEach(customer => {
-      const elRow = document.createElement('tr');
-      elRow.innerHTML = `
-        <td>${customer.id}</td>
-        <td>${customer.email}</td>
-      `;
-      elList.appendChild(elRow);
-    });
-    
+    const elCardTable = elCard.querySelector('.card-table');
+    const table = new Table(elCardTable);
+    table.columns = [{name: '#', attribute: 'id'}, {name: 'Email', attribute: 'email'}];
+    table.rows = this.customers_.all();
+
     return elCard;
   }
 }
