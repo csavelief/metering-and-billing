@@ -9,6 +9,10 @@ export class Customers {
     this.customers_ = [];
   }
 
+  all() {
+    return this.customers_;
+  }
+
   get(email) {
     return this.customers_.find(c => c.email === email);
   }
@@ -37,6 +41,10 @@ export class Features {
 
   constructor() {
     this.features_ = [];
+  }
+
+  all() {
+    return this.features_;
   }
 
   get(name) {

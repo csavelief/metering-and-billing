@@ -1,6 +1,8 @@
 'use strict'
 
 import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Prices, Strategies} from "./datastore.js";
+import {CardCustomers} from "./CardCustomers.js";
+import {CardFeatures} from "./CardFeatures.js";
 
 export class App {
 
@@ -24,25 +26,11 @@ export class App {
           <div class="page-body">
             <div class="container-xl">
               <div class="row row-deck row-cards">
-                <div class="col-4">
-                  <div class="card">
-                    <div class="card-body" style="height: 10rem"></div>
-                  </div>
+                <div id="card-customers" class="col-6">
+                  <!-- FILLED DYNAMICALLY -->
                 </div>
-                <div class="col-4">
-                  <div class="card">
-                    <div class="card-body" style="height: 10rem"></div>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="card">
-                    <div class="card-body" style="height: 10rem"></div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-body" style="height: 10rem"></div>
-                  </div>
+                <div id="card-features" class="col-6">
+                  <!-- FILLED DYNAMICALLY -->
                 </div>
               </div>
             </div>
@@ -50,6 +38,24 @@ export class App {
         </div>
       </div>
     `;
+
+    // PoC
+    this._meteringAndBillingPoC();
+
+    // Init the Customers card
+    const elCardCustomers = container.querySelector('#card-customers');
+    const cardCustomers = new CardCustomers(elCardCustomers);
+    cardCustomers.addCustomer('jdoe@example.com');
+
+    // Init the Features card
+    const elCardFeatures = container.querySelector('#card-features');
+    const cardFeatures = new CardFeatures(elCardFeatures);
+    cardFeatures.addOrUpdateFeature('user-created');
+
+    // TODO
+  }
+
+  _meteringAndBillingPoC() {
 
     const customers = new Customers();
     customers.add('jdoe@example.com');
