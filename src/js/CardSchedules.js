@@ -1,6 +1,6 @@
 'use strict'
 
-import {Customers, Plans, Schedules} from "./datastore.js";
+import {Customers, Events, Plans, Pricer, Schedules, Strategies} from "./datastore.js";
 import {Table} from "./Table.js";
 
 export class CardSchedules extends com.computablefacts.widgets.Widget {
@@ -9,7 +9,9 @@ export class CardSchedules extends com.computablefacts.widgets.Widget {
     super(container);
     this.schedules_ = new Schedules();
     this.customers_ = new Customers();
+    this.strategies_ = new Strategies();
     this.plans_ = new Plans();
+    this.events_ = new Events();
     this.observers_ = new com.computablefacts.observers.Subject();
   }
 
@@ -24,6 +26,16 @@ export class CardSchedules extends com.computablefacts.widgets.Widget {
 
   set plans(plans) {
     this.plans_ = plans;
+    this.render();
+  }
+
+  set strategies(strategies) {
+    this.strategies_ = strategies;
+    this.render();
+  }
+
+  set events(events) {
+    this.events_ = events;
     this.render();
   }
 
@@ -109,6 +121,11 @@ export class CardSchedules extends com.computablefacts.widgets.Widget {
         return row.plans.map(plan => {
           return `<span class="badge bg-blue-lt">${plan}</span>`;
         }).join(' ')
+      }
+    }, {
+      name: 'Price (€)', attribute: null, render: row => {
+        const pricer = new Pricer(this.strategies_, this.plans_, this.schedules_, this.events_);
+        return pricer.price(row.customer);
       }
     }];
     elTable.rows = this.schedules_.all();

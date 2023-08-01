@@ -216,10 +216,10 @@ export class Events {
     return this.events_.filter(e => e.customer === customer && features.indexOf(e.feature) >= 0);
   }
 
-  add(customerName, featureName, amount) {
+  add(timestamp, customerName, featureName, amount) {
 
     const event = {
-      id: this.events_.length + 1, timestamp: new Date(), customer: customerName, feature: featureName, amount: amount
+      id: this.events_.length + 1, timestamp: timestamp, customer: customerName, feature: featureName, amount: amount
     };
 
     this.events_.push(event);
@@ -229,9 +229,7 @@ export class Events {
 
 export class Pricer {
 
-  constructor(customers, features, strategies, plans, schedules, events) {
-    this.customers_ = customers;
-    this.features_ = features;
+  constructor(strategies, plans, schedules, events) {
     this.strategies_ = strategies;
     this.plans_ = plans;
     this.schedules_ = schedules;
@@ -246,7 +244,8 @@ export class Pricer {
 
       // Ensure the plan has not been sunset...
       const plan = this.plans_.get(planName);
-      return (!plan.begin || plan.begin <= dateYyyyMmDd) && (!plan.end || dateYyyyMmDd <= plan.end);
+      const strategy = plan ? this.strategies_.get(plan.strategy) : null;
+      return strategy && plan && (!plan.begin || plan.begin <= dateYyyyMmDd) && (!plan.end || dateYyyyMmDd <= plan.end);
     }).map(planName => {
 
       const plan = this.plans_.get(planName);
