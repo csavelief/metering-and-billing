@@ -4,6 +4,7 @@ import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Strategies
 import {CardCustomers} from "./CardCustomers.js";
 import {CardFeatures} from "./CardFeatures.js";
 import {CardStrategies} from "./CardStrategies.js";
+import {CardPlans} from "./CardPlans.js";
 
 export class App {
 
@@ -27,15 +28,20 @@ export class App {
           <div class="page-body">
             <div class="container-xl">
               <div class="row row-deck row-cards">
-                <div id="card-customers" class="col-6">
-                  <!-- FILLED DYNAMICALLY -->
-                </div>
-                <div id="card-features" class="col-6">
+                <div id="card-plans" class="col">
                   <!-- FILLED DYNAMICALLY -->
                 </div>
               </div>
               <div class="row row-deck row-cards" style="margin-top: var(--tblr-gutter-y)">
                 <div id="card-strategies" class="col">
+                  <!-- FILLED DYNAMICALLY -->
+                </div>
+              </div>
+              <div class="row row-deck row-cards" style="margin-top: var(--tblr-gutter-y)">
+                <div id="card-customers" class="col-6">
+                  <!-- FILLED DYNAMICALLY -->
+                </div>
+                <div id="card-features" class="col-6">
                   <!-- FILLED DYNAMICALLY -->
                 </div>
               </div>
@@ -61,14 +67,24 @@ export class App {
     // Init the 'Customers' card
     const elCardCustomers = container.querySelector('#card-customers');
     const elCustomers = new CardCustomers(elCardCustomers);
-    elCustomers.addCustomer('ACME Inc.');
 
     // Init the 'Features' card
     const elCardFeatures = container.querySelector('#card-features');
     const elFeatures = new CardFeatures(elCardFeatures);
-    elFeatures.addOrUpdateFeature('user-created');
     elFeatures.onFeaturesUpdate(features => elStrategies.features = features);
     elStrategies.features = elFeatures.features;
+
+    // Init the 'Plans' card
+    const elCardPlans = container.querySelector('#card-plans');
+    const elPlans = new CardPlans(elCardPlans);
+    elStrategies.onStrategiesUpdate(strategies => elPlans.strategies = strategies);
+    elPlans.strategies = elStrategies.strategies;
+
+    // Init with fake data
+    elCustomers.addCustomer('ACME Inc.');
+    elFeatures.addOrUpdateFeature('user-created');
+    elPlans.addOrUpdatePlan('Plan n°1', 'Summing Strategy', null, null);
+    elPlans.addOrUpdatePlan('Plan n°2', 'Multiplying Strategy', null, null);
 
     // TODO
   }

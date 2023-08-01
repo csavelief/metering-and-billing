@@ -123,24 +123,33 @@ export class Plans {
     return this.plans_.find(p => p.name === name);
   }
 
-  addOrUpdate(name, strategyName, begin, end) {
+  addOrUpdate(name, strategyName, beginYyyyMmDd, endYyyyMmDd) {
 
     let plan = this.get(name);
 
     if (plan) {
       plan.name = name;
       plan.strategy = strategyName;
-      plan.begin = begin;
-      plan.end = end;
+      plan.begin = beginYyyyMmDd;
+      plan.end = endYyyyMmDd;
       return plan;
     }
+
+    const getDate = (date) => {
+      if (!date) {
+        return null;
+      }
+      const offset = date.getTimezoneOffset();
+      const newDate = new Date(date.getTime() - (offset * 60 * 1000));
+      return newDate.toISOString().split('T')[0];
+    };
 
     plan = {
       id: this.plans_.length + 1,
       name: name,
       strategy: strategyName,
-      begin: !begin ? new Date().getTime() : begin,
-      end: end
+      begin: !beginYyyyMmDd ? getDate(new Date()) : beginYyyyMmDd,
+      end: endYyyyMmDd
     };
 
     this.plans_.push(plan);
@@ -252,8 +261,8 @@ export class Pricer {
 
         const plan = this.plans_.get(p.plan);
         const strategy = this.strategies_.get(plan.strategy);
-        const begin = plan.begin;
-        const end = plan.end;
+        const begin = new Date(plan.begin).getTime();
+        const end = new Date(plan.end).getTime();
         const events = this.events_.get(customerName, strategy.features).filter(
             e => (!begin || e.timestamp >= begin) && (!end || e.timestamp <= end));
 
