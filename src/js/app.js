@@ -101,7 +101,7 @@ export class App {
     elStrategies.addOrUpdateStrategy('Multiplying Strategy', ['nb_connections'], (events) => {
       return events.reduce((prev, cur) => prev * cur.amount, 1);
     });
-    elSchedules.addOrUpdateSchedule('ACME Inc.', ['Plan n°1', 'Plan n°2']);
+    elSchedules.addOrUpdateSchedule('ACME Inc.', ['Plan n°1']);
     this._createRandomEvents(elCustomers, elFeatures, elEvents);
 
     // Init components with fake data
