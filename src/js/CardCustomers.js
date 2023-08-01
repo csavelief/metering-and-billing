@@ -16,7 +16,7 @@ export class CardCustomers extends com.computablefacts.widgets.Widget {
   }
 
   addCustomer(email) {
-    this.customers_.add(email);
+    this.customers_.addOrUpdate(email);
     this.render();
   }
 

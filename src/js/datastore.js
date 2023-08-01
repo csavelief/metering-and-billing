@@ -26,7 +26,7 @@ export class Customers {
     return this.customers_.find(c => c.name === name);
   }
 
-  add(name) {
+  addOrUpdate(name) {
 
     let customer = this.get(name);
 
@@ -100,7 +100,6 @@ export class Strategies {
     let strategy = this.get(name);
 
     if (strategy) {
-      strategy.name = name;
       strategy.features = features;
       strategy.strategy = fnStrategy;
       return strategy;
@@ -137,7 +136,6 @@ export class Plans {
     let plan = this.get(name);
 
     if (plan) {
-      plan.name = name;
       plan.strategy = strategyName;
       plan.begin = beginYyyyMmDd;
       plan.end = endYyyyMmDd;
@@ -167,54 +165,37 @@ export class Plans {
 }
 
 /**
- * The plans subscribed by a given customer.
+ * The plans subscribed by all customers.
  */
-export class CustomerSchedule {
+export class Schedules {
 
-  constructor(customerName) {
-    this.customer_ = customerName;
-    this.plans_ = [];
-  }
-
-  customer() {
-    return this.customer_;
+  constructor() {
+    this.schedules_ = [];
   }
 
   all() {
-    return this.plans_;
+    return this.schedules_;
   }
 
-  plans() {
-    const dateYyyyMmDd = getDate(new Date());
-    return this.plans_.filter(p => (!p.begin || p.begin <= dateYyyyMmDd) && (!p.end || dateYyyyMmDd <= p.end));
+  get(customerName) {
+    return this.schedules_.find(s => s.customer === customerName);
   }
 
-  add(planName, beginYyyyMmDd, endYyyyMmDd) {
+  addOrUpdate(customerName, plans) {
 
-    let plan = this.plans_.find(p => p.name === planName);
+    let schedule = this.schedules_.find(s => s.customer === customerName);
 
-    if (plan) {
-      return plan;
+    if (schedule) {
+      schedule.plans = plans;
+      return schedule;
     }
 
-    plan = {
-      id: this.plans_.length + 1,
-      plan: planName,
-      begin: !beginYyyyMmDd ? getDate(new Date()) : beginYyyyMmDd,
-      end: endYyyyMmDd
+    schedule = {
+      id: this.schedules_.length + 1, customer: customerName, plans: plans
     };
 
-    this.plans_.push(plan);
-    return plan;
-  }
-
-  sunset(planName, endYyyyMmDd) {
-
-    const plan = this.plans_.find(p => p.name === planName && !p.end);
-
-    if (plan && !plan.end) {
-      plan.end = !endYyyyMmDd ? getDate(new Date()) : endYyyyMmDd;
-    }
+    this.schedules_.push(schedule);
+    return schedule;
   }
 }
 
@@ -258,19 +239,24 @@ export class Pricer {
   }
 
   price(customerName, plans) {
-    return this.schedules_.filter(schedule => schedule.customer() === customerName)
-    .flatMap(schedule => {
-      return schedule.plans().filter(p => !plans || plans.indexOf(p.plan) >= 0).map(p => {
 
-        const plan = this.plans_.get(p.plan);
-        const strategy = this.strategies_.get(plan.strategy);
-        const begin = plan.begin;
-        const end = plan.end;
-        const events = this.events_.get(customerName, strategy.features).filter(
-            e => (!begin || begin <= getDate(e.timestamp)) && (!end || getDate(e.timestamp) <= end));
+    const dateYyyyMmDd = getDate(new Date());
+    const schedule = this.schedules_.get(customerName);
+    return !schedule ? 0 : schedule.plans.filter(p => !plans || plans.indexOf(p) >= 0).filter(planName => {
 
-        return strategy.strategy(events);
-      });
+      // Ensure the plan has not been sunset...
+      const plan = this.plans_.get(planName);
+      return (!plan.begin || plan.begin <= dateYyyyMmDd) && (!plan.end || dateYyyyMmDd <= plan.end);
+    }).map(planName => {
+
+      const plan = this.plans_.get(planName);
+      const strategy = this.strategies_.get(plan.strategy);
+      const begin = plan.begin;
+      const end = plan.end;
+      const events = this.events_.get(customerName, strategy.features).filter(
+          e => (!begin || begin <= getDate(e.timestamp)) && (!end || getDate(e.timestamp) <= end));
+
+      return strategy.strategy(events);
     }).reduce((prev, cur) => prev + cur, 0);
   }
 }

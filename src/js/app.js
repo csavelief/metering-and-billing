@@ -1,10 +1,11 @@
 'use strict'
 
-import {Customers, CustomerSchedule, Events, Features, Plans, Pricer, Strategies} from "./datastore.js";
+import {Customers, Events, Features, Plans, Pricer, Schedules, Strategies} from "./datastore.js";
 import {CardCustomers} from "./CardCustomers.js";
 import {CardFeatures} from "./CardFeatures.js";
 import {CardStrategies} from "./CardStrategies.js";
 import {CardPlans} from "./CardPlans.js";
+import {CardSchedules} from "./CardSchedules.js";
 
 export class App {
 
@@ -28,6 +29,11 @@ export class App {
           <div class="page-body">
             <div class="container-xl">
               <div class="row row-deck row-cards">
+                <div id="card-schedules" class="col">
+                  <!-- FILLED DYNAMICALLY -->
+                </div>
+              </div>
+              <div class="row row-deck row-cards" style="margin-top: var(--tblr-gutter-y)">
                 <div id="card-plans" class="col">
                   <!-- FILLED DYNAMICALLY -->
                 </div>
@@ -54,45 +60,54 @@ export class App {
     // PoC
     this._meteringAndBillingPoC();
 
+    // Init the 'Customers Schedules' card
+    const elCardSchedules = container.querySelector('#card-schedules');
+    const elSchedules = new CardSchedules(elCardSchedules);
+
     // Init the 'Strategies' card
     const elCardStrategies = container.querySelector('#card-strategies');
     const elStrategies = new CardStrategies(elCardStrategies);
+    elStrategies.onStrategiesUpdate(strategies => elPlans.strategies = strategies);
+
+    // Init the 'Customers' card
+    const elCardCustomers = container.querySelector('#card-customers');
+    const elCustomers = new CardCustomers(elCardCustomers);
+    elCustomers.onCustomersUpdate(customers => elSchedules.customers = customers);
+
+    // Init the 'Features' card
+    const elCardFeatures = container.querySelector('#card-features');
+    const elFeatures = new CardFeatures(elCardFeatures);
+    elFeatures.onFeaturesUpdate(features => elStrategies.features = features);
+
+    // Init the 'Plans' card
+    const elCardPlans = container.querySelector('#card-plans');
+    const elPlans = new CardPlans(elCardPlans);
+    elPlans.onPlansUpdate(plans => elSchedules.plans = plans);
+
+    // Create fake data
+    elCustomers.addCustomer('ACME Inc.');
+    elFeatures.addOrUpdateFeature('user-created');
+    elPlans.addOrUpdatePlan('Plan n°1', 'Summing Strategy', null, null);
+    elPlans.addOrUpdatePlan('Plan n°2', 'Multiplying Strategy', null, null);
     elStrategies.addOrUpdateStrategy('Summing Strategy', ['user-created'], (events) => {
       return events.reduce((prev, cur) => prev + cur.amount, 0);
     });
     elStrategies.addOrUpdateStrategy('Multiplying Strategy', ['user-created'], (events) => {
       return events.reduce((prev, cur) => prev * cur.amount, 1);
     });
+    elSchedules.addOrUpdateSchedule('ACME Inc.', ['Plan n°1', 'Plan n°2']);
 
-    // Init the 'Customers' card
-    const elCardCustomers = container.querySelector('#card-customers');
-    const elCustomers = new CardCustomers(elCardCustomers);
-
-    // Init the 'Features' card
-    const elCardFeatures = container.querySelector('#card-features');
-    const elFeatures = new CardFeatures(elCardFeatures);
-    elFeatures.onFeaturesUpdate(features => elStrategies.features = features);
+    // Init components with fake data
     elStrategies.features = elFeatures.features;
-
-    // Init the 'Plans' card
-    const elCardPlans = container.querySelector('#card-plans');
-    const elPlans = new CardPlans(elCardPlans);
-    elStrategies.onStrategiesUpdate(strategies => elPlans.strategies = strategies);
     elPlans.strategies = elStrategies.strategies;
-
-    // Init with fake data
-    elCustomers.addCustomer('ACME Inc.');
-    elFeatures.addOrUpdateFeature('user-created');
-    elPlans.addOrUpdatePlan('Plan n°1', 'Summing Strategy', null, null);
-    elPlans.addOrUpdatePlan('Plan n°2', 'Multiplying Strategy', null, null);
-
-    // TODO
+    elSchedules.customers = elCustomers.customers;
+    elSchedules.plans = elPlans.plans;
   }
 
   _meteringAndBillingPoC() {
 
     const customers = new Customers();
-    customers.add('ACME Inc.');
+    customers.addOrUpdate('ACME Inc.');
 
     const features = new Features();
     features.addOrUpdate('nb_connections');
@@ -109,16 +124,15 @@ export class App {
     plans.addOrUpdate('Plan n°1', 'sum', null, null);
     plans.addOrUpdate('Plan n°2', 'mul', null, null);
 
-    const schedule = new CustomerSchedule('ACME Inc.');
-    schedule.add('Plan n°1');
-    schedule.add('Plan n°2');
+    const schedule = new Schedules();
+    schedule.addOrUpdate('ACME Inc.', ['Plan n°1', 'Plan n°2']);
 
     const events = new Events();
     events.add('ACME Inc.', 'nb_connections', 1);
     events.add('ACME Inc.', 'nb_connections', 1);
     events.add('ACME Inc.', 'nb_connections', 1);
 
-    const pricer = new Pricer(customers, features, strategies, plans, [schedule], events);
+    const pricer = new Pricer(customers, features, strategies, plans, schedule, events);
     const sum1 = pricer.price('ACME Inc.');
     const sum2 = pricer.price('ACME Inc.', ['Plan n°2']);
     const sum3 = pricer.price('ACME Inc.', ['Plan n°1']);

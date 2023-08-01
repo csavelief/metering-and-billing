@@ -15,7 +15,7 @@ export class CardStrategies extends com.computablefacts.widgets.Widget {
   get strategies() {
     return this.strategies_;
   }
-  
+
   set features(features) {
     this.features_ = features;
     this.render();
@@ -76,7 +76,7 @@ export class CardStrategies extends com.computablefacts.widgets.Widget {
               </div>
               <div class="mb-3">
                 <div class="form-label">Select one or more features :</div>
-                <select type="text" class="form-select" id="select-features" value="" multiple="multiple">
+                <select type="text" class="form-select" value="" multiple="multiple">
                   <!-- FILLED DYNAMICALLY -->
                 </select>
               </div>

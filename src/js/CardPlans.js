@@ -12,6 +12,10 @@ export class CardPlans extends com.computablefacts.widgets.Widget {
     this.observers_ = new com.computablefacts.observers.Subject();
   }
 
+  get plans() {
+    return this.plans_;
+  }
+
   set strategies(strategies) {
     this.strategies_ = strategies;
     this.render();
@@ -72,7 +76,7 @@ export class CardPlans extends com.computablefacts.widgets.Widget {
               </div>
               <div class="mb-3">
                 <div class="form-label">Select a single strategy :</div>
-                <select type="text" class="form-select" id="select-strategies" value="">
+                <select type="text" class="form-select" value="">
                   <!-- FILLED DYNAMICALLY -->
                 </select>
               </div>
@@ -193,7 +197,7 @@ export class CardPlans extends com.computablefacts.widgets.Widget {
       };
 
       const elInputPlanName = elCard.querySelector('#modal-add-plan .modal-body input');
-      this.addOrUpdatePlan(elInputPlanName.value, getSelection(elSelectStrategy), getDate(beginDatePicker),
+      this.addOrUpdatePlan(elInputPlanName.value, getSelection(elSelectStrategy)[0], getDate(beginDatePicker),
           getDate(endDatePicker));
       this.observers_.notify('plans-update');
     };
