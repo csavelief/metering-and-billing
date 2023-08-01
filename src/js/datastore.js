@@ -1,5 +1,14 @@
 'use strict'
 
+const getDate = (date) => {
+  if (!date) {
+    return null;
+  }
+  const offset = date.getTimezoneOffset();
+  const newDate = new Date(date.getTime() - (offset * 60 * 1000));
+  return newDate.toISOString().split('T')[0];
+};
+
 /**
  * A list of customers.
  */
@@ -135,15 +144,6 @@ export class Plans {
       return plan;
     }
 
-    const getDate = (date) => {
-      if (!date) {
-        return null;
-      }
-      const offset = date.getTimezoneOffset();
-      const newDate = new Date(date.getTime() - (offset * 60 * 1000));
-      return newDate.toISOString().split('T')[0];
-    };
-
     plan = {
       id: this.plans_.length + 1,
       name: name,
@@ -180,12 +180,16 @@ export class CustomerSchedule {
     return this.customer_;
   }
 
-  plans() {
-    const timestamp = new Date().getTime();
-    return this.plans_.filter(p => timestamp >= p.begin && (!p.end || timestamp <= p.end));
+  all() {
+    return this.plans_;
   }
 
-  add(planName, begin, end) {
+  plans() {
+    const dateYyyyMmDd = getDate(new Date());
+    return this.plans_.filter(p => (!p.begin || p.begin <= dateYyyyMmDd) && (!p.end || dateYyyyMmDd <= p.end));
+  }
+
+  add(planName, beginYyyyMmDd, endYyyyMmDd) {
 
     let plan = this.plans_.find(p => p.name === planName);
 
@@ -194,19 +198,22 @@ export class CustomerSchedule {
     }
 
     plan = {
-      id: this.plans_.length + 1, plan: planName, begin: !begin ? new Date().getTime() : begin, end: end
+      id: this.plans_.length + 1,
+      plan: planName,
+      begin: !beginYyyyMmDd ? getDate(new Date()) : beginYyyyMmDd,
+      end: endYyyyMmDd
     };
 
     this.plans_.push(plan);
     return plan;
   }
 
-  sunset(planName, end) {
+  sunset(planName, endYyyyMmDd) {
 
     const plan = this.plans_.find(p => p.name === planName && !p.end);
 
     if (plan && !plan.end) {
-      plan.end = !end ? new Date().getTime() : end;
+      plan.end = !endYyyyMmDd ? getDate(new Date()) : endYyyyMmDd;
     }
   }
 }
@@ -231,11 +238,7 @@ export class Events {
   add(customerName, featureName, amount) {
 
     const event = {
-      id: this.events_.length + 1,
-      timestamp: new Date().getTime(),
-      customer: customerName,
-      feature: featureName,
-      amount: amount
+      id: this.events_.length + 1, timestamp: new Date(), customer: customerName, feature: featureName, amount: amount
     };
 
     this.events_.push(event);
@@ -261,10 +264,10 @@ export class Pricer {
 
         const plan = this.plans_.get(p.plan);
         const strategy = this.strategies_.get(plan.strategy);
-        const begin = new Date(plan.begin).getTime();
-        const end = new Date(plan.end).getTime();
+        const begin = plan.begin;
+        const end = plan.end;
         const events = this.events_.get(customerName, strategy.features).filter(
-            e => (!begin || e.timestamp >= begin) && (!end || e.timestamp <= end));
+            e => (!begin || begin <= getDate(e.timestamp)) && (!end || getDate(e.timestamp) <= end));
 
         return strategy.strategy(events);
       });
